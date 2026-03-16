@@ -1441,6 +1441,9 @@ export async function monitorMattermostProvider(opts: MonitorMattermostOpts = {}
       log: logVerboseMessage,
       warn: logVerboseMessage,
     });
+    if (account.blockStreaming === true) {
+      logVerboseMessage("mattermost: draft preview forces block streaming off for this reply path");
+    }
     let lastPartialText = "";
     let finalizedViaPreviewPost = false;
 
@@ -1573,6 +1576,8 @@ export async function monitorMattermostProvider(opts: MonitorMattermostOpts = {}
             dispatcher,
             replyOptions: {
               ...replyOptions,
+              // Draft previews require a single editable reply lane, so block
+              // streaming is intentionally disabled for this path.
               disableBlockStreaming: true,
               onModelSelected,
               onPartialReply: (payload) => {
