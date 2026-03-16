@@ -178,6 +178,13 @@ export function canFinalizeMattermostPreviewInPlace(params: {
   );
 }
 
+export function shouldClearMattermostDraftPreview(params: {
+  queuedFinal: boolean;
+  finalizedViaPreviewPost: boolean;
+}): boolean {
+  return !params.queuedFinal && !params.finalizedViaPreviewPost;
+}
+
 export function resolveMattermostEffectiveReplyToId(params: {
   kind: ChatType;
   postId?: string | null;
@@ -1583,7 +1590,7 @@ export async function monitorMattermostProvider(opts: MonitorMattermostOpts = {}
       });
 
     try {
-      await core.channel.reply.withReplyDispatcher({
+      const dispatchResult = await core.channel.reply.withReplyDispatcher({
         dispatcher,
         onSettled: () => {
           markDispatchIdle();
@@ -1619,6 +1626,15 @@ export async function monitorMattermostProvider(opts: MonitorMattermostOpts = {}
             },
           }),
       });
+      if (
+        shouldClearMattermostDraftPreview({
+          queuedFinal: dispatchResult.queuedFinal,
+          finalizedViaPreviewPost,
+        })
+      ) {
+        logVerboseMessage("mattermost: clearing draft preview because no final reply was queued");
+        await draftStream.clear();
+      }
     } finally {
       try {
         await draftStream.stop();
