@@ -1681,9 +1681,6 @@ export async function monitorMattermostProvider(opts: MonitorMattermostOpts = {}
             tableMode,
             sendMessage: sendMessageMattermost,
           });
-          if (isFinal) {
-            finalReplyDelivered = true;
-          }
           runtime.log?.(`delivered reply to ${to}`);
         },
         onError: (err, info) => {
