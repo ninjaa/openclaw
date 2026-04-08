@@ -1,4 +1,4 @@
-import { createFinalizableDraftLifecycle } from "../../../../src/channels/draft-stream-controls.js";
+import { createFinalizableDraftLifecycle } from "openclaw/plugin-sdk/channel-lifecycle";
 import {
   createMattermostPost,
   deleteMattermostPost,
